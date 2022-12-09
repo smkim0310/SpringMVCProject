@@ -9,6 +9,7 @@ import java.util.List;
 
 import com.crud.BoardVO;
 import com.crud.JDBCUtil;
+import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -17,6 +18,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class BoardDAO {
+
+	//BoardDAO using JdbcTemplate
+	/*
 	@Autowired
 	private JdbcTemplate template;
 
@@ -29,6 +33,7 @@ public class BoardDAO {
 	private final String BOARD_DELETE="delete from BOARD where seq=?";
 	private final String BOARD_GET="select * from BOARD where seq=?";
 	private final String BOARD_LIST="select * from BOARD order by seq desc";
+
 
 	public int insertBoard(BoardVO vo){
 		return template.update(BOARD_INSERT,new Object[]{vo.getTitle(), vo.getWriter(),vo.getContent()});
@@ -59,5 +64,36 @@ public class BoardDAO {
 				return data;
 			}
 		});
+	}
+	*/
+
+
+	//BoardDAO using mybatis
+	@Autowired
+	SqlSession sqlSession;
+
+	public int insertBoard(BoardVO vo){
+		int result=sqlSession.insert("Board.insertBoard",vo);
+		return result;
+	}
+
+	public int updateBoard(BoardVO vo){
+		int result=sqlSession.update("Board.updateBoard",vo);
+		return result;
+	}
+
+	public int deleteBoard(int id){
+		int result=sqlSession.delete("Board.deleteBoard",id);
+		return result;
+	}
+
+	public BoardVO getBoard(int seq){
+		BoardVO one=sqlSession.selectOne("Board.getBoard",seq);
+		return one;
+	}
+
+	public List<BoardVO> getBoardList(){
+		List<BoardVO> list=sqlSession.selectList("Board.getBoardList");
+		return list;
 	}
 }
